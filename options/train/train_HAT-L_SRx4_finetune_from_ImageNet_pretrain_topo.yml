@@ -1,0 +1,140 @@
+# general settings
+name: train_HAT-L_SRx4_finetune_from_ImageNet_pretrain_topo
+model_type: HATModel
+scale: 4
+# num_gpu: auto
+num_gpu: auto
+manual_seed: 0
+
+# dataset and data loader settings
+datasets:
+  train:
+    name: ANT_train
+    type: PairedImageDataset
+    dataroot_gt: ./datasets/ANT_train/ANT_train_HR_sub
+    dataroot_lq: ./datasets/ANT_train/ANT_train_LR_sub/X4_sub
+    # meta_info_file: hat/data/meta_info/meta_info_DF2Ksub_GT.txt
+    io_backend:
+      type: disk
+
+    # Change
+    gt_size: 60
+    use_hflip: true
+    use_rot: true
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 1
+    batch_size_per_gpu: 2
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  val_1:
+    name: ANT_val
+    type: PairedImageDataset
+    dataroot_gt: ./datasets/ANT_val/ANT_val_HR_sub
+    dataroot_lq: ./datasets/ANT_val/ANT_val_LR_sub/X4_sub
+    io_backend:
+      type: disk
+
+ # Only one validation dataset
+ # val_2:
+ #   name: Set14
+ #   type: PairedImageDataset
+ #   dataroot_gt: ./datasets/Set14/GTmod4
+ #   dataroot_lq: ./datasets/Set14/LRbicx4
+ #   io_backend:
+ #     type: disk
+
+  # val_3:
+  #   name: Urban100
+  #   type: PairedImageDataset
+  #   dataroot_gt: ./datasets/urban100/GTmod4
+  #   dataroot_lq: ./datasets/urban100/LRbicx4
+  #   io_backend:
+  #     type: disk
+
+
+# network structures
+network_g:
+  type: HAT
+  upscale: 4
+  in_chans: 3
+  # 64 before
+  img_size: 64
+  window_size: 16
+  compress_ratio: 3
+  squeeze_factor: 30
+  conv_scale: 0.01
+  overlap_ratio: 0.5
+  img_range: 1.
+  depths: [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
+  embed_dim: 180
+  num_heads: [6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6]
+  mlp_ratio: 2
+  upsampler: 'pixelshuffle'
+  resi_connection: '1conv'
+
+# path
+path:
+  # Change
+  # pretrain_network_g: ./experiments/train_HAT-L_SRx4_ImageNet_from_scratch/models/net_g_latest.pth
+  pretrain_network_g: ./experiments/pretrained_models/HAT-L_SRx4_ImageNet-pretrain.pth
+  param_key_g: 'params_ema'
+  strict_load_g: true
+  resume_state: ~
+
+# training settings
+train:
+  ema_decay: 0.999
+  optim_g:
+    type: Adam
+    lr: !!float 1e-5
+    weight_decay: 0
+    betas: [0.9, 0.99]
+
+  scheduler:
+    type: MultiStepLR
+    milestones: [125000, 200000, 225000, 240000]
+    gamma: 0.5
+
+  total_iter: 250000
+  warmup_iter: -1  # no warm up
+
+  # losses
+  pixel_opt:
+    type: L1Loss
+    loss_weight: 1.0
+    reduction: mean
+
+# validation settings
+val:
+  val_freq: !!float 5e3
+  save_img: false
+  pbar: False
+
+  metrics:
+    psnr:
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: true
+      better: higher  # the higher, the better. Default: higher
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: true
+      better: higher  # the higher, the better. Default: higher
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 5e3
+  use_tb_logger: true
+  wandb:
+    project: ~
+    resume_id: ~
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500
