@@ -18,7 +18,8 @@ datasets:
       type: disk
 
     # Change
-    gt_size: 60
+    # gt_size: 60
+    gt_size: 256
     use_hflip: true
     use_rot: true
 
@@ -37,31 +38,14 @@ datasets:
     io_backend:
       type: disk
 
- # Only one validation dataset
- # val_2:
- #   name: Set14
- #   type: PairedImageDataset
- #   dataroot_gt: ./datasets/Set14/GTmod4
- #   dataroot_lq: ./datasets/Set14/LRbicx4
- #   io_backend:
- #     type: disk
-
-  # val_3:
-  #   name: Urban100
-  #   type: PairedImageDataset
-  #   dataroot_gt: ./datasets/urban100/GTmod4
-  #   dataroot_lq: ./datasets/urban100/LRbicx4
-  #   io_backend:
-  #     type: disk
-
-
 # network structures
 network_g:
   type: HAT
   upscale: 4
   in_chans: 3
-  # 64 before
+  # img_size: 64
   img_size: 64
+  # window_size: 16
   window_size: 16
   compress_ratio: 3
   squeeze_factor: 30
@@ -77,7 +61,7 @@ network_g:
 
 # path
 path:
-  # Change
+  # This would continue with previous training:
   # pretrain_network_g: ./experiments/train_HAT-L_SRx4_ImageNet_from_scratch/models/net_g_latest.pth
   pretrain_network_g: ./experiments/pretrained_models/HAT-L_SRx4_ImageNet-pretrain.pth
   param_key_g: 'params_ema'
@@ -95,10 +79,13 @@ train:
 
   scheduler:
     type: MultiStepLR
-    milestones: [125000, 200000, 225000, 240000]
+    # milestones: [125000, 200000, 225000, 240000]
+    milestones: [125000]
     gamma: 0.5
 
-  total_iter: 250000
+  # Default is total_iter: 250000
+  # toal iter 5000
+  total_iter: 125000
   warmup_iter: -1  # no warm up
 
   # losses
@@ -109,7 +96,9 @@ train:
 
 # validation settings
 val:
+  # val_freq: !!float 5e3
   val_freq: !!float 5e3
+  # defaul is false
   save_img: false
   pbar: False
 
@@ -128,6 +117,7 @@ val:
 # logging settings
 logger:
   print_freq: 100
+  # Only save all 5000
   save_checkpoint_freq: !!float 5e3
   use_tb_logger: true
   wandb:
