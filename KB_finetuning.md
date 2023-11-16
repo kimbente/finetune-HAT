@@ -113,3 +113,15 @@ Notes:
     - almost 14 GiB at batch-size = 4
 - Val frequency understand output (set to 100 now)
 - Multistep LR decays the learning rate
+
+## First half training 
+
+Expected to take 18 hours
+
+2023-11-13 12:28:10,239 INFO: Training statistics:
+        Number of train images: 200
+        Dataset enlarge ratio: 1
+        Batch size per gpu: 2
+        World size (gpu number): 1
+        Require iter number per epoch: 100
+        Total epochs: 1250; iters: 125000.
