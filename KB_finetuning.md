@@ -125,3 +125,16 @@ Expected to take 18 hours
         World size (gpu number): 1
         Require iter number per epoch: 100
         Total epochs: 1250; iters: 125000.
+
+# Estimates
+
+python hat/test.py -opt options/test/HAT-L_SRx4_ImageNet-pretrain_finetunes_topo_test_DOME_C.yml
+
+Location of best model:
+experiments/train_HAT-L_SRx4_finetune_from_ImageNet_pretrain_topo/models/net_g_40000.pth
+
+Last log:
+2023-11-13 23:47:02,400 INFO: [train..][epoch:400, iter:  40,100, lr:(1.000e-05,)] [eta: 12:51:06, time (data): 0.580 (0.003)] l_pix: 7.4883e-04 
+
+# Normal pretrained model
+python hat/test.py -opt options/test/HAT-L_SRx4_ImageNet-pretrain_nofinetune_topo_test_DOME_C.yml
