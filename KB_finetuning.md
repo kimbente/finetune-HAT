@@ -138,3 +138,19 @@ Last log:
 
 # Normal pretrained model
 python hat/test.py -opt options/test/HAT-L_SRx4_ImageNet-pretrain_nofinetune_topo_test_DOME_C.yml
+
+- Be careful with cropping and reshaping. Permute before reshaping. Check tensor ordering for cropping.
+
+# South Pole finetuning
+
+CUDA_VISIBLE_DEVICES=0 torchrun --standalone --nproc-per-node=1  hat/train.py -opt options/train/train_HAT-L_SRx4_finetune_from_ImageNet_pretrain_topo_SouthPole.yml
+
+options > train > train_HAT-L_SRx4_finetune_from_ImageNet_pretrain_topo_SouthPole.yml
+
+experiments > train_..._SouthPole >
+
+# Reconstruction test with SP model
+
+python hat/test.py -opt options/test/HAT-L_SRx4_ImageNet-pretrain_finetuned_SouthPole_topo_test_DOME_C.yml
+
+results are in results/HAT-L_SRx4_ImageNet-pretrain-finetune_SouthPole_KB/visualization/ANT_test_DOME_C
